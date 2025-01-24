@@ -16,7 +16,6 @@ import { sendLoginLink } from "./link.js";
 import { sendVerificationCode } from "./verificationCode";
 import { logout } from "./logout.js";
 import { mode, setMode, setModeSync } from "./mode.js";
-// import { setIframe } from "./iframe.js";
 import { user } from "./user.js";
 import "./user.methods.js";
 import { refresh } from "./refresh.js";
@@ -32,6 +31,14 @@ let initCallbacks = [];
 function init(tenantId, opts = {}) {
   if (!tenantId) return console.warn("Userfront initialized without tenantId");
 
+  if (typeof window === 'undefined' && !opts.supressNodeWarning) {
+    console.warn(
+      "`window` is not found. Is Userfront core.js running from a browser? " +
+      "If not running from a browser, you will need to explicitly set `axios.defaults.headers.common['Origin']` for API calls. " +
+      "To disable this warning init core.js with `{ supressNodeWarning: true }`"
+    );
+  }
+
   store.tenantId = tenantId;
 
   store.baseUrl = opts.baseUrl || apiUrl;
@@ -46,8 +53,12 @@ function init(tenantId, opts = {}) {
     axios.defaults.headers.common["x-origin"] = url;
   }
 
+  axios.defaults.headers.common["x-userfront-source"] = "core-js";
+  if (opts.userfrontSource) {
+    axios.defaults.headers.common["x-userfront-source"] = opts.userfrontSource;
+  }
+
   setTokenNames();
-  // setIframe(); // TODO re-enable when iframe is needed
   setTokensFromCookies();
 
   // Estimate the mode synchronously with local data.

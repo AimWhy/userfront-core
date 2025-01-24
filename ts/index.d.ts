@@ -1,5 +1,14 @@
 // init
-export declare function init(tenantId: string, options?: object): Promise<void>;
+interface InitOptions {
+  baseUrl?: string;
+  domain?: string;
+  userfrontSource?: string;
+  supressNodeWarning?: boolean;
+}
+export declare function init(
+  tenantId: string,
+  options?: InitOptions
+): Promise<void>;
 
 // addInitCallback()
 export declare function addInitCallback(callback: Function): void;
@@ -157,6 +166,7 @@ export declare function signup({
   handlePkceRequired,
   handleTokens,
   handleRedirect,
+  options,
 }: {
   method: string;
   email?: string;
@@ -172,6 +182,9 @@ export declare function signup({
   handlePkceRequired?: Function;
   handleTokens?: Function;
   handleRedirect?: Function;
+  options?: {
+    noSignupEmail?: boolean;
+  };
 }): Promise<SignupResponse>;
 
 // login()
@@ -189,12 +202,15 @@ export declare function login({
   // Link
   token,
   uuid,
+  linkType,
   // Totp
   totpCode,
   backupCode,
   // Verification code
-  verificationCode,
   channel,
+  verificationCode,
+  // Custom SSO
+  providerId,
   // Other
   redirect,
   handleUpstreamResponse,
@@ -214,10 +230,12 @@ export declare function login({
   password?: string;
   token?: string;
   uuid?: string;
+  linkType?: string;
   totpCode?: string;
   backupCode?: string;
-  verificationCode?: string;
   channel?: "sms" | "email";
+  verificationCode?: string;
+  providerId?: string;
   redirect?: string | boolean;
   handleUpstreamResponse?: Function;
   handleMfaRequired?: Function;
